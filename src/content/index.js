@@ -2,20 +2,24 @@ console.info('chrome-ext template-vanilla-js content script')
 
 let textInputField;
 
-console.log(document);
 
 document.addEventListener("keydown", function(event) {
   console.log("1", event)
   console.log("2", event.metaKey, event.code)
-  console.log("3", textInputField , document.activeElement)
-
-  if (event.metaKey && event.code === "KeyK" && textInputField === document.activeElement) {
+  // console.log("3", textInputField , document.activeElement)
+  let noden =  document.activeElement.nodeName;
+  console.log(document.activeElement)
+  if (event.metaKey && event.code === "KeyK" && ("TEXTAREA" === noden || "INPUT" === noden)) {
     event.preventDefault();
     console.log("key pressed k ");
-    const selectionStart = textInputField.selectionStart;
-    const textBeforeCursor = textInputField.value.slice(0, selectionStart);
-    const textAfterCursor = textInputField.value.slice(selectionStart);
+    textInputField = document.activeElement.innerHTML
+    const selectionStart = document.activeElement.selectionStart;
+    console.log(selectionStart)
+    console.log(textInputField)
+    const textBeforeCursor = textInputField.slice(0, selectionStart);
+    const textAfterCursor = textInputField.slice(selectionStart);
     const textToComplete = textBeforeCursor.split(" ").pop();
+    console.log({textToComplete})
     const prompt = textToComplete + "\n";
     fetch("https://api.openai.com/v1/completions", {
       method: "POST",
