@@ -20,21 +20,26 @@ document.addEventListener("keydown", function(event) {
     const textAfterCursor = textInputField.slice(selectionStart);
     const textToComplete = textBeforeCursor.split(" ").pop();
     console.log({textToComplete})
-    const prompt = textToComplete + "\n";
+    console.log({textAfterCursor})
+    console.log({textBeforeCursor})
+    const prompt = textBeforeCursor + "\n";
     fetch("https://api.openai.com/v1/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer $OPENAI_API_KEY"
+        "Authorization": "Bearer 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"
+        // "Authorization": "Bearer $OPENAI_API_KEY"
       },
       body: JSON.stringify({
         prompt: prompt,
-        max_tokens: 60,
+        max_tokens: 500,
+        model: "text-davinci-003"	,
         temperature: 0.7
       })
     })
     .then(response => response.json())
     .then(data => {
+      console.log(data)
       const recommendedText = data.choices[0].text.trim();
       const textAfterRecommendation = textAfterCursor.trimLeft();
       const completedText = recommendedText.slice(textToComplete.length);
