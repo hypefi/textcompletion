@@ -4,16 +4,16 @@ let textInputField;
 
 
 document.addEventListener("keydown", function(event) {
-  console.log("1", event)
-  console.log("2", event.metaKey, event.code)
+  // console.log("1", event)
+  // console.log("2", event.metaKey, event.code)
   // console.log("3", textInputField , document.activeElement)
   let noden =  document.activeElement.nodeName;
   console.log(document.activeElement)
   if (event.metaKey && event.code === "KeyK" && ("TEXTAREA" === noden || "INPUT" === noden)) {
     event.preventDefault();
-    console.log("key pressed k ");
+    // console.log("key pressed k ");
     textInputField = document.activeElement.innerHTML
-    const selectionStart = document.activeElement.selectionStart;
+    let selectionStart = document.activeElement.selectionStart;
     console.log(selectionStart)
     console.log(textInputField)
     const textBeforeCursor = textInputField.slice(0, selectionStart);
@@ -42,11 +42,14 @@ document.addEventListener("keydown", function(event) {
       console.log(data)
       const recommendedText = data.choices[0].text.trim();
       const textAfterRecommendation = textAfterCursor.trimLeft();
-      const completedText = recommendedText.slice(textToComplete.length);
-      const newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
-      textInputField.value = newText;
-      textInputField.selectionStart = selectionStart + completedText.length;
-      textInputField.selectionEnd = textInputField.selectionStart;
+      let completedText = recommendedText.slice(textToComplete.length);
+      let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
+      console.log({recommendedText})
+      console.log({newText})
+
+      document.activeElement.innerHTML = newText;
+      selectionStart = selectionStart + completedText.length;
+      selectionEnd = selectionStart;
     })
     .catch(error => console.error(error));
   }
