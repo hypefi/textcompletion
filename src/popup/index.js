@@ -2,6 +2,25 @@ import './index.css'
 
 const crx = 'create-chrome-ext'
 
+
+// Function to prompt the user for an API key
+function promptApiKey() {
+  var apiKey = prompt("Please enter your API key:");
+  return apiKey;
+}
+
+// Function to save the API key to Chrome storage
+function saveApiKey(apiKey) {
+  chrome.storage.sync.set({ "apiKey": apiKey }, function() {
+    console.log("API key saved: " + apiKey);
+  });
+}
+
+// Call the promptApiKey function and save the result to Chrome storage
+var apiKey = promptApiKey();
+saveApiKey(apiKey);
+
+
 document.querySelector('#app').innerHTML = `
 <main>
 <h3>Popup Page!</h3>

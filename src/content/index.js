@@ -1,34 +1,40 @@
 console.info('chrome-ext template-vanilla-js content script')
 
 let textInputField;
-
+let OPEN_API_KEY;
 
 document.addEventListener("keydown", function(event) {
   // console.log("1", event)
   // console.log("2", event.metaKey, event.code)
-  // console.log("3", textInputField , document.activeElement)
+  console.log("3", textInputField , document.activeElement)
   let noden =  document.activeElement.nodeName;
-  console.log(document.activeElement)
+  // console.log(document.activeElement)
   if (event.metaKey && event.code === "KeyK" && ("TEXTAREA" === noden || "INPUT" === noden)) {
     event.preventDefault();
     // console.log("key pressed k ");
     textInputField = document.activeElement.innerHTML
     let selectionStart = document.activeElement.selectionStart;
-    console.log(selectionStart)
-    console.log(textInputField)
+    // console.log(selectionStart)
+    // console.log(textInputField)
     const textBeforeCursor = textInputField.slice(0, selectionStart);
     const textAfterCursor = textInputField.slice(selectionStart);
     const textToComplete = textBeforeCursor.split(" ").pop();
-    console.log({textToComplete})
-    console.log({textAfterCursor})
+    // console.log({textToComplete})
+    // console.log({textAfterCursor})
     console.log({textBeforeCursor})
+
+    chrome.storage.local.get("apiKey", function(data) {
+      console.log("API key retrieved: ", data.apiKey);
+      OPEN_API_KEY=data.apiKey;
+    });
+
     const prompt = textBeforeCursor + "\n";
     fetch("https://api.openai.com/v1/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
-        // "Authorization": "Bearer $OPENAI_API_KEY"
+        // "Authorization": "Bearer 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"
+        "Authorization": "Bearer ${OPENAI_API_KEY}"
       },
       body: JSON.stringify({
         prompt: prompt,
@@ -68,15 +74,15 @@ document.addEventListener("focusout", function(event) {
   }
 });
 
-document.addEventListener("keydown", function(event) {
-  if (event.key === "a" && event.target === textInputField) {
-    event.preventDefault();
-    // Accept recommended text
-  }
-  if (event.key === "c" && event.target === textInputField) {
-    event.preventDefault();
-    // Request change of recommendation
-  }
-});
+// document.addEventListener("keydown", function(event) {
+//   if (event.key === "a" && event.target === textInputField) {
+//     event.preventDefault();
+//     // Accept recommended text
+//   }
+//   if (event.key === "c" && event.target === textInputField) {
+//     event.preventDefault();
+//     // Request change of recommendation
+//   }
+// });
 
 export {}
