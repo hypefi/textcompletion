@@ -16,22 +16,22 @@ function saveApiKey(apiKey) {
   });
 }
 
-// Call the promptApiKey function and save the result to Chrome storage
+// if apikey is not already present Call the promptApiKey function and save the result to Chrome storage
 var apiKey = promptApiKey();
 saveApiKey(apiKey);
 
 
-document.querySelector('#app').innerHTML = `
-<main>
-<h3>Popup Page!</h3>
+// document.querySelector('#app').innerHTML = `
+// <main>
+// <h3>Popup Page!</h3>
 
-<h6>v 0.0.0</h6>
+// <h6>v 0.0.0</h6>
 
-<a
-  href="https://www.npmjs.com/package/create-chrome-ext"
-  target="_blank"
->
-  Power by ${crx}
-</a>
-</main>
+// <a
+//   href="https://www.npmjs.com/package/create-chrome-ext"
+//   target="_blank"
+// >
+//   Power by ${crx}
+// </a>
+// </main>
 `
