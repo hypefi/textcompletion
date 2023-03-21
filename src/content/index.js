@@ -1,14 +1,54 @@
 console.info('chrome-ext template-vanilla-js content script')
 
 let textInputField;
-let OPEN_API_KEY;
+let OPENAI_API_KEY;
 
-chrome.storage.local.get("apiKey", function(data) {
-  console.log("API key retrieved: ", data.apiKey);
-  OPEN_API_KEY=data.apiKey;
-});
+async function handleResponse(response) {
+  try {
+    const data = await response.json();
+    console.log(data);
+    const recommendedText = data.choices[0].text.trim();
+    const textAfterRecommendation = textAfterCursor.trimLeft();
+    let completedText = recommendedText.slice(textToComplete.length);
+    let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
+    console.log({ recommendedText });
+    console.log({ newText });
 
-document.addEventListener("keydown", function(event) {
+    document.activeElement.innerHTML = newText;
+    selectionStart = selectionStart + completedText.length;
+    selectionEnd = selectionStart;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+function fetchCompletions(prompt, apiKey) {
+  return fetch("https://api.openai.com/v1/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      prompt: prompt,
+      max_tokens: 500,
+      model: "text-davinci-003",
+      temperature: 0.7,
+    }),
+  });
+}
+
+function getApiKey() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("apiKey", function (data) {
+      console.log("API key retrieved: ", data.apiKey);
+      resolve(data.apiKey);
+    });
+  });
+}
+
+document.addEventListener("keydown", async function(event) {
   // console.log("1", event)
   // console.log("2", event.metaKey, event.code)
   console.log("3", textInputField , document.activeElement)
@@ -28,37 +68,12 @@ document.addEventListener("keydown", function(event) {
     // console.log({textAfterCursor})
     console.log({textBeforeCursor})
 
+    OPENAI_API_KEY = await getApiKey();
 
+    console.log(OPENAI_API_KEY);
     const prompt = textBeforeCursor + "\n";
-    fetch("https://api.openai.com/v1/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // "Authorization": "Bearer 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"
-        "Authorization": "Bearer ${OPENAI_API_KEY}"
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        max_tokens: 500,
-        model: "text-davinci-003"	,
-        temperature: 0.7
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data)
-      const recommendedText = data.choices[0].text.trim();
-      const textAfterRecommendation = textAfterCursor.trimLeft();
-      let completedText = recommendedText.slice(textToComplete.length);
-      let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
-      console.log({recommendedText})
-      console.log({newText})
-
-      document.activeElement.innerHTML = newText;
-      selectionStart = selectionStart + completedText.length;
-      selectionEnd = selectionStart;
-    })
-    .catch(error => console.error(error));
+    const response = await fetchCompletions(prompt, OPENAI_API_KEY);
+    handleResponse(response);
   }
 });
 
