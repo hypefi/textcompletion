@@ -3,6 +3,11 @@ console.info('chrome-ext template-vanilla-js content script')
 let textInputField;
 let OPEN_API_KEY;
 
+chrome.storage.local.get("apiKey", function(data) {
+  console.log("API key retrieved: ", data.apiKey);
+  OPEN_API_KEY=data.apiKey;
+});
+
 document.addEventListener("keydown", function(event) {
   // console.log("1", event)
   // console.log("2", event.metaKey, event.code)
@@ -23,10 +28,6 @@ document.addEventListener("keydown", function(event) {
     // console.log({textAfterCursor})
     console.log({textBeforeCursor})
 
-    chrome.storage.local.get("apiKey", function(data) {
-      console.log("API key retrieved: ", data.apiKey);
-      OPEN_API_KEY=data.apiKey;
-    });
 
     const prompt = textBeforeCursor + "\n";
     fetch("https://api.openai.com/v1/completions", {
