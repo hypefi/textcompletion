@@ -48,6 +48,15 @@ function getApiKey() {
   });
 }
 
+function updateApiKey(newApiKey) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.set({ apiKey: newApiKey }, () => {
+      console.log("API key updated: ", newApiKey);
+      resolve();
+    });
+  });
+}
+
 document.addEventListener("keydown", async function(event) {
   // console.log("1", event)
   // console.log("2", event.metaKey, event.code)
@@ -88,6 +97,29 @@ document.addEventListener("focusout", function(event) {
   if (event.target === textInputField) {
     textInputField = null;
   }
+});
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const apiKeyInput = document.getElementById("apiKeyInput");
+  const updateApiKeyButton = document.getElementById("updateApiKeyButton");
+
+  // Set the initial value of the input field to the current API key
+  const currentApiKey = await getApiKey();
+  apiKeyInput.value = currentApiKey;
+
+  // Listen for changes in the input field
+  apiKeyInput.addEventListener("input", (event) => {
+    const newApiKey = event.target.value;
+    updateApiKey(newApiKey);
+  });
+
+  // Listen for button clicks
+  updateApiKeyButton.addEventListener("click", async () => {
+    const newApiKey = apiKeyInput.value;
+    await updateApiKey(newApiKey);
+    alert("API key updated!");
+  });
 });
 
 // document.addEventListener("keydown", function(event) {
