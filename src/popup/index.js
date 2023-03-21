@@ -1,6 +1,57 @@
 import './index.css'
 
+
 const crx = 'textcompletion'
+
+
+
+const apiKeyInput = document.getElementById("apiKeyInput");
+const updateApiKeyButton = document.getElementById("updateApiKeyButton");
+
+
+function updateApiKey(newApiKey) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.set({ apiKey: newApiKey }, () => {
+      console.log("API key updated: ", newApiKey);
+      resolve();
+    });
+  });
+}
+
+function getApiKey() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("apiKey", function (data) {
+      console.log("API key retrieved: ", data.apiKey);
+      resolve(data.apiKey);
+    });
+  });
+}
+
+
+(async function() {
+  // Set the initial value of the input field to the current API key
+  const currentApiKey = await getApiKey();
+  apiKeyInput.value = currentApiKey;
+})();
+
+// Listen for changes in the input field
+apiKeyInput.addEventListener("input", (event) => {
+  console.log(event.target.value);
+  const newApiKey = event.target.value;
+  updateApiKey(newApiKey);
+});
+
+// Listen for button clicks
+updateApiKeyButton.addEventListener("click", async () => {
+  console.log("click")
+  const newApiKey = apiKeyInput.value;
+  await updateApiKey(newApiKey);
+  alert("API key updated!");
+});
+
+
+
+
 
 // Function to prompt the user for an API key
 function promptApiKey() {

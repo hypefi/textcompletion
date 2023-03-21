@@ -3,6 +3,10 @@ console.info('chrome-ext template-vanilla-js content script')
 let textInputField;
 let OPENAI_API_KEY;
 
+
+
+
+
 async function handleResponse(response) {
   try {
     const data = await response.json();
@@ -100,27 +104,30 @@ document.addEventListener("focusout", function(event) {
 });
 
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const apiKeyInput = document.getElementById("apiKeyInput");
-  const updateApiKeyButton = document.getElementById("updateApiKeyButton");
+// document.addEventListener("DOMContentLoaded", async () => {
+// // window.addEventListener("load", async () => {
+//   console.log("loaaad")
+//   const apiKeyInput = document.getElementById("apiKeyInput");
+//   const updateApiKeyButton = document.getElementById("updateApiKeyButton");
 
-  // Set the initial value of the input field to the current API key
-  const currentApiKey = await getApiKey();
-  apiKeyInput.value = currentApiKey;
+//   // Set the initial value of the input field to the current API key
+//   const currentApiKey = await getApiKey();
+//   apiKeyInput.value = currentApiKey;
 
-  // Listen for changes in the input field
-  apiKeyInput.addEventListener("input", (event) => {
-    const newApiKey = event.target.value;
-    updateApiKey(newApiKey);
-  });
+//   // Listen for changes in the input field
+//   apiKeyInput.addEventListener("input", (event) => {
+//     const newApiKey = event.target.value;
+//     updateApiKey(newApiKey);
+//   });
 
-  // Listen for button clicks
-  updateApiKeyButton.addEventListener("click", async () => {
-    const newApiKey = apiKeyInput.value;
-    await updateApiKey(newApiKey);
-    alert("API key updated!");
-  });
-});
+//   // Listen for button clicks
+//   updateApiKeyButton.addEventListener("click", async () => {
+//     const newApiKey = apiKeyInput.value;
+//     console.log(newApiKey);
+//     await updateApiKey(newApiKey);
+//     alert("API key updated!");
+//   });
+// });
 
 // document.addEventListener("keydown", function(event) {
 //   if (event.key === "a" && event.target === textInputField) {
