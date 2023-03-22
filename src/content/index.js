@@ -7,7 +7,7 @@ let OPENAI_API_KEY;
 
 
 
-async function handleResponse(response) {
+async function handleResponse(response, textAfterCursor, textToComplete, textBeforeCursor, slstart) {
   try {
     const data = await response.json();
     console.log(data);
@@ -18,9 +18,9 @@ async function handleResponse(response) {
     console.log({ recommendedText });
     console.log({ newText });
 
-    document.activeElement.innerHTML = newText;
-    selectionStart = selectionStart + completedText.length;
-    selectionEnd = selectionStart;
+    document.activeElement.value = textBeforeCursor + newText;
+    slstart = slstart + completedText.length;
+    let slend = slstart;
   } catch (error) {
     console.error(error);
   }
@@ -86,7 +86,7 @@ document.addEventListener("keydown", async function(event) {
     console.log(OPENAI_API_KEY);
     const prompt = textBeforeCursor + "\n";
     const response = await fetchCompletions(prompt, OPENAI_API_KEY);
-    handleResponse(response);
+    handleResponse(response, textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
   }
 });
 
