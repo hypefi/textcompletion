@@ -1,7 +1,7 @@
-- add change openai api key, 
-- give hints to user in UI in form of styled popups when the openai api is caleld and when there is an error
-- maybe add the feature of accepting or rejecting the completion
+> - Add change openai api key, 
+- Add balance 
+- Give hints to user in UI in form of styled popups when the openai api is caleld and when there is an error
 - add choose the model 
-- add how much request you made and estimation of tokens used / Dollars used 
+ - Maybe add the feature of accepting or rejecting the completion
 - start/stop extension button 
 
