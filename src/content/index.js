@@ -2,6 +2,27 @@ console.info('chrome-ext template-vanilla-js content script')
 
 let textInputField;
 let OPENAI_API_KEY;
+let selectedModel;
+
+
+chrome.storage.local.get('selectedModel', (result) => {
+  const modelMap = {
+    chatweb: "text-davinci-002-render-sha",
+    chat3: "text-davinci-003",
+    chat35: "gpt-3.5-turbo", 
+    chatgptplus4 : "gpt-4",
+    chatgptapi4_8k: "gpt-4",
+    chatgptapi4_32k: "gpt-4-32k",
+  };
+
+  const selectedModel = result.selectedModel;
+  const modelName = modelMap[selectedModel];
+
+  if (modelName) {
+    // Call fetchCompletions with the selected model
+    fetchCompletions("Sample prompt", "your_api_key", modelName);
+  }
+});
 
 
 
@@ -27,7 +48,8 @@ async function handleResponse(response, textAfterCursor, textToComplete, textBef
 }
 
 
-function fetchCompletions(prompt, apiKey) {
+function fetchCompletions(prompt, apiKey, model) {
+  console.log(model, " apikey ", apikey)
   return fetch("https://api.openai.com/v1/completions", {
     method: "POST",
     headers: {
@@ -37,11 +59,13 @@ function fetchCompletions(prompt, apiKey) {
     body: JSON.stringify({
       prompt: prompt,
       max_tokens: 500,
-      model: "text-davinci-003",
+      model: model,
       temperature: 0.7,
     }),
   });
 }
+
+
 
 function getApiKey() {
   return new Promise((resolve, reject) => {
@@ -82,10 +106,11 @@ document.addEventListener("keydown", async function(event) {
     console.log({textBeforeCursor})
 
     OPENAI_API_KEY = await getApiKey();
+    selectedModel = await getModelname();
 
     console.log(OPENAI_API_KEY);
     const prompt = textBeforeCursor + "\n";
-    const response = await fetchCompletions(prompt, OPENAI_API_KEY);
+    const response = await fetchCompletions(prompt, OPENAI_API_KEY, selectedModel);
     handleResponse(response, textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
   }
 });
@@ -103,41 +128,5 @@ document.addEventListener("focusout", function(event) {
   }
 });
 
-
-// document.addEventListener("DOMContentLoaded", async () => {
-// // window.addEventListener("load", async () => {
-//   console.log("loaaad")
-//   const apiKeyInput = document.getElementById("apiKeyInput");
-//   const updateApiKeyButton = document.getElementById("updateApiKeyButton");
-
-//   // Set the initial value of the input field to the current API key
-//   const currentApiKey = await getApiKey();
-//   apiKeyInput.value = currentApiKey;
-
-//   // Listen for changes in the input field
-//   apiKeyInput.addEventListener("input", (event) => {
-//     const newApiKey = event.target.value;
-//     updateApiKey(newApiKey);
-//   });
-
-//   // Listen for button clicks
-//   updateApiKeyButton.addEventListener("click", async () => {
-//     const newApiKey = apiKeyInput.value;
-//     console.log(newApiKey);
-//     await updateApiKey(newApiKey);
-//     alert("API key updated!");
-//   });
-// });
-
-// document.addEventListener("keydown", function(event) {
-//   if (event.key === "a" && event.target === textInputField) {
-//     event.preventDefault();
-//     // Accept recommended text
-//   }
-//   if (event.key === "c" && event.target === textInputField) {
-//     event.preventDefault();
-//     // Request change of recommendation
-//   }
-// });
 
 export {}

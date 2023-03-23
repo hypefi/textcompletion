@@ -1,6 +1,6 @@
 import './index.css'
 
-const crx = 'create-chrome-ext'
+const crx = 'textcompletion'
 document.querySelector('#app').innerHTML = `
   <main>
   <h3>Options Page!</h3>

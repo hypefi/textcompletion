@@ -4,7 +4,6 @@ import './index.css'
 const crx = 'textcompletion'
 
 
-
 const apiKeyInput = document.getElementById("apiKeyInput");
 const updateApiKeyButton = document.getElementById("updateApiKeyButton");
 
@@ -152,5 +151,22 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error fetching account balance:', error);
       // You can display an error message in your extension's popup here
     }
+  });
+
+
+  const apiModelSelect = document.getElementById('api_model');
+
+  // Load the previously saved selection
+  chrome.storage.local.get('selectedModel', (result) => {
+    if (result.selectedModel) {
+      apiModelSelect.value = result.selectedModel;
+    }
+  });
+
+  apiModelSelect.addEventListener('change', function (e) {
+    const selectedModel = e.target.value;
+
+    // Save the selected model
+    chrome.storage.local.set({ selectedModel: selectedModel });
   });
 });
