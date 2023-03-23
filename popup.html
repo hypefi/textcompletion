@@ -2,28 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/icon/logo.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title> Chrome Extensioin + Vanilla + JS + Vite App - Popup </title>
-  </head>
-  <head>
-    <title>Text completion extension</title>
-    <div id="app"></div>
-    <script type="module" src="/src/popup/index.js"></script>
+    <title>Chrome Extension Popup</title>
+    <link rel="stylesheet" href="./popup.css">
   </head>
   <body>
     <h1>Text completion</h1>
-    <label for="apiKeyInput">API Key:</label>
-    <input type="text" id="apiKeyInput" />
-    <button id="updateApiKeyButton">Update API Key</button>
-    <button id="checkBalanceButton">Balance</button>
-    <div>
-    <label for="models">API Model :</label>
-    <select id="api_model" name="api_models">
-      <option value="chatweb">Chatgpt web</option>
-      <option value="chat3">Chatgpt 3</option>
-      <option value="chat35">Chatgpt 3.5</option>
-    </select>
+    <div class="form-group">
+      <label for="apiKeyInput">API Key:</label>
+      <input type="text" id="apiKeyInput" />
+    </div>
+    <div class="button-group">
+      <button id="updateApiKeyButton">Update API Key</button>
+      <button id="checkBalanceButton">Balance</button>
+    </div>
+    <div class="form-group">
+      <label for="models">API Model :</label>
+      <select id="api_model" name="api_models">
+        <option value="chatweb">Chatgpt web</option>
+        <option value="chat3">Chatgpt 3</option>
+        <option value="chat35">Chatgpt 3.5</option>
+      </select>
     </div>
   </body>
 </html>

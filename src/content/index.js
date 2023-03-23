@@ -5,8 +5,6 @@ let OPENAI_API_KEY;
 let selectedModel;
 
 
-
-
 function getModel() {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get("selectedModel", function (data) {
