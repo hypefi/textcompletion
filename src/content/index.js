@@ -5,26 +5,29 @@ let OPENAI_API_KEY;
 let selectedModel;
 
 
-chrome.storage.local.get('selectedModel', (result) => {
-  const modelMap = {
-    chatweb: "text-davinci-002-render-sha",
-    chat3: "text-davinci-003",
-    chat35: "gpt-3.5-turbo", 
-    chatgptplus4 : "gpt-4",
-    chatgptapi4_8k: "gpt-4",
-    chatgptapi4_32k: "gpt-4-32k",
-  };
-
-  const selectedModel = result.selectedModel;
-  const modelName = modelMap[selectedModel];
-
-  if (modelName) {
-    // Call fetchCompletions with the selected model
-    fetchCompletions("Sample prompt", "your_api_key", modelName);
-  }
-});
 
 
+function getModel() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("selectedModel", function (data) {
+      console.log("Model retrieved: ", data.selectedModel);
+
+      const modelMap = {
+        chatweb: "text-davinci-002-render-sha",
+        chat3: "text-davinci-003",
+        chat35: "gpt-3.5-turbo", 
+        chatgptplus4 : "gpt-4",
+        chatgptapi4_8k: "gpt-4",
+        chatgptapi4_32k: "gpt-4-32k",
+      };
+
+      const selectedModel = data.selectedModel;
+      const modelName = modelMap[selectedModel];
+
+      resolve(modelName);
+    });
+  });
+}
 
 
 
@@ -49,7 +52,7 @@ async function handleResponse(response, textAfterCursor, textToComplete, textBef
 
 
 function fetchCompletions(prompt, apiKey, model) {
-  console.log(model, " apikey ", apikey)
+  console.log(model, " apikey ", apiKey)
   return fetch("https://api.openai.com/v1/completions", {
     method: "POST",
     headers: {
@@ -106,7 +109,7 @@ document.addEventListener("keydown", async function(event) {
     console.log({textBeforeCursor})
 
     OPENAI_API_KEY = await getApiKey();
-    selectedModel = await getModelname();
+    selectedModel = await getModel();
 
     console.log(OPENAI_API_KEY);
     const prompt = textBeforeCursor + "\n";
