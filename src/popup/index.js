@@ -1,89 +1,76 @@
 import './index.css'
 
-
 const crx = 'textcompletion'
 
-
-const apiKeyInput = document.getElementById("apiKeyInput");
-const updateApiKeyButton = document.getElementById("updateApiKeyButton");
-
+const apiKeyInput = document.getElementById('apiKeyInput')
+const updateApiKeyButton = document.getElementById('updateApiKeyButton')
+const checkBalanceButton = document.getElementById('checkBalanceButton')
 
 function updateApiKey(newApiKey) {
   return new Promise((resolve, reject) => {
     chrome.storage.local.set({ apiKey: newApiKey }, () => {
-      console.log("API key updated: ", newApiKey);
-      resolve();
-    });
-  });
+      console.log('API key updated: ', newApiKey)
+      resolve()
+    })
+  })
 }
 
 function getApiKey() {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("apiKey", function (data) {
-      console.log("API key retrieved: ", data.apiKey);
-      resolve(data.apiKey);
-    });
-  });
+    chrome.storage.local.get('apiKey', function (data) {
+      console.log('API key retrieved: ', data.apiKey)
+      resolve(data.apiKey)
+    })
+  })
 }
 
-
-(async function() {
+;(async function () {
   // Set the initial value of the input field to the current API key
-  const currentApiKey = await getApiKey();
-  apiKeyInput.value = currentApiKey;
-})();
-
-// Listen for changes in the input field
-apiKeyInput.addEventListener("input", (event) => {
-  console.log(event.target.value);
-  const newApiKey = event.target.value;
-  updateApiKey(newApiKey);
-});
-
-// Listen for button clicks
-updateApiKeyButton.addEventListener("click", async () => {
-  console.log("click")
-  const newApiKey = apiKeyInput.value;
-  await updateApiKey(newApiKey);
-  alert("API key updated!");
-});
-
-
-
-
+  const currentApiKey = await getApiKey()
+  apiKeyInput.value = currentApiKey
+})()
 
 // Function to prompt the user for an API key
 function promptApiKey() {
-  console.log("prompt api key")
-  var apiKey = prompt("Please enter your API key:");
-  return apiKey;
+  return prompt('Please enter your API key:')
 }
 
-// Function to save the API key to Chrome storage
 function saveApiKey(apiKey) {
-  console.log("save api key")
-  console.log(chrome.storage);
-  chrome.storage.local.set({ "apiKey": apiKey }, function() {
-    console.log("API key saved: " + apiKey);
-  });
+  console.log('save api key')
+  console.log(chrome.storage)
+  chrome.storage.local.set({ apiKey: apiKey }, function () {
+    console.log('API key saved: ' + apiKey)
+  })
 }
 
-
-// Load the API key from Chrome storage, prompt the user for a new one if it's not found
-loadApiKey(function(apiKey) {
-
+function loadingApiKey() {
   return new Promise((resolve, reject) => {
-        
-  if (!apiKey) {
-    apiKey = promptApiKey();
-    saveApiKey(apiKey);
-    resolve(apiKey);
-  } else {
-    console.log("API key found: " + apiKey);
-    resolve(apiKey);
-    }
-   });
-});
+    loadApiKey()
+      .then((apiKey) => {
+        if (!apiKey) {
+          apiKey = promptApiKey()
+          saveApiKey(apiKey)
+          resolve(apiKey)
+        } else {
+          console.log('API key found: ' + apiKey)
+          resolve(apiKey)
+        }
+      })
+      .catch((error) => {
+        console.error('Error loading API key:', error)
+        reject(error)
+      })
+  })
+}
+
+// Call the getApiKey function
+loadingApiKey()
+  .then((apiKey) => {
+    console.log('Retrieved API key:', apiKey)
+  })
+  .catch((error) => {
+    console.error('Error retrieving API key:', error)
+  })
 
 // Add this function below your existing functions
 async function getOpenAIAccountBalance(apiKey) {
@@ -91,82 +78,90 @@ async function getOpenAIAccountBalance(apiKey) {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
-  });
+  })
 
   if (!response.ok) {
-    throw new Error(`Error fetching balance: ${response.statusText}`);
+    throw new Error(`Error fetching balance: ${response.statusText}`)
   }
 
   const balanceData = (await response.json()).total_available.toFixed(2)
 
-  return balanceData;
+  return balanceData
 }
-
 
 // Function to load the API key from Chrome storage
 function loadApiKey() {
   return new Promise((resolve, reject) => {
-    console.log("load api key");
-    chrome.storage.local.get("apiKey", function(data) {
+    console.log('load api key')
+    chrome.storage.local.get('apiKey', function (data) {
       if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-        reject(chrome.runtime.lastError);
-        return;
+        console.error(chrome.runtime.lastError)
+        reject(chrome.runtime.lastError)
+        return
       }
-      resolve(data.apiKey);
-    });
-  });
+      resolve(data.apiKey)
+    })
+  })
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const apiKeyInput = document.getElementById('apiKeyInput')
+  const updateApiKeyButton = document.getElementById('updateApiKeyButton')
+  const checkBalanceButton = document.getElementById('checkBalanceButton')
 
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const updateApiKeyButton = document.getElementById('updateApiKeyButton');
-  const checkBalanceButton = document.getElementById('checkBalanceButton');
+  // Listen for changes in the input field
+  apiKeyInput.addEventListener('input', (event) => {
+    console.log(event.target.value)
+    const newApiKey = event.target.value
+    updateApiKey(newApiKey)
+  })
 
-  updateApiKeyButton.addEventListener('click', () => {
-      apiKeyInput.type = 'password';
-    });
+  // Listen for button clicks
+  if (updateApiKeyButton) {
+    updateApiKeyButton.addEventListener('click', async () => {
+      console.log('click')
+      const newApiKey = apiKeyInput.value
+      await updateApiKey(newApiKey)
+      alert('API key updated!')
+    })
+  }
 
   let apiKey_
 
   checkBalanceButton.addEventListener('click', async () => {
     try {
-      apiKey_ = await loadApiKey();
+      apiKey_ = await loadApiKey()
       if (!apiKey_) {
-        apiKey_ = promptApiKey();
-        saveApiKey(apiKey_);
+        apiKey_ = promptApiKey()
+        saveApiKey(apiKey_)
       } else {
-        console.log("API key found: " + apiKey_);
+        console.log('API key found: ' + apiKey_)
       }
-
-      console.log({ apiKey_ });
-      const balance = await getOpenAIAccountBalance(apiKey_);
-      console.log('Account balance:', balance);
+      console.log({ apiKey_ })
+      const balance = await getOpenAIAccountBalance(apiKey_)
+      console.log('Account balance:', balance)
       // You can display the balance in your extension's popup here
-      checkBalanceButton.innerHTML = balance;
+      checkBalanceButton.innerHTML = balance
     } catch (error) {
-      console.error('Error fetching account balance:', error);
+      console.error('Error fetching account balance:', error)
       // You can display an error message in your extension's popup here
     }
-  });
+  })
 
-
-  const apiModelSelect = document.getElementById('api_model');
+  const apiModelSelect = document.getElementById('api_model')
 
   // Load the previously saved selection
   chrome.storage.local.get('selectedModel', (result) => {
     if (result.selectedModel) {
-      apiModelSelect.value = result.selectedModel;
+      apiModelSelect.value = result.selectedModel
     }
-  });
+  })
 
   apiModelSelect.addEventListener('change', function (e) {
-    const selectedModel = e.target.value;
-
+    const selectedModel = e.target.value
     // Save the selected model
-    chrome.storage.local.set({ selectedModel: selectedModel });
-  });
-});
+    chrome.storage.local.set({ selectedModel: selectedModel })
+  })
+})

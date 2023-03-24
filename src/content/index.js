@@ -5,6 +5,17 @@ let OPENAI_API_KEY;
 let selectedModel;
 
 
+
+//custom cursor when fetching 
+const style = document.createElement('style');
+style.textContent = `
+  .custom-cursor {
+  cursor: url('/Users/admin/Downloads/output-onlinegiftools.gif'), auto;
+  }
+`;
+document.head.appendChild(style);
+
+
 function getModel() {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get("selectedModel", function (data) {
@@ -86,24 +97,17 @@ function updateApiKey(newApiKey) {
   });
 }
 
+
 document.addEventListener("keydown", async function(event) {
-  // console.log("1", event)
-  // console.log("2", event.metaKey, event.code)
-  console.log("3", textInputField , document.activeElement)
+  console.log("keydown");
   let noden =  document.activeElement.nodeName;
-  // console.log(document.activeElement)
   if (event.metaKey && event.code === "KeyK" && ("TEXTAREA" === noden || "INPUT" === noden)) {
     event.preventDefault();
-    // console.log("key pressed k ");
     textInputField = document.activeElement.innerHTML
     let selectionStart = document.activeElement.selectionStart;
-    // console.log(selectionStart)
-    // console.log(textInputField)
     const textBeforeCursor = textInputField.slice(0, selectionStart);
     const textAfterCursor = textInputField.slice(selectionStart);
     const textToComplete = textBeforeCursor.split(" ").pop();
-    // console.log({textToComplete})
-    // console.log({textAfterCursor})
     console.log({textBeforeCursor})
 
     OPENAI_API_KEY = await getApiKey();
@@ -111,7 +115,15 @@ document.addEventListener("keydown", async function(event) {
 
     console.log(OPENAI_API_KEY);
     const prompt = textBeforeCursor + "\n";
+    
+    // Add the custom cursor class to the body
+    document.body.classList.add('custom-cursor');
+    
     const response = await fetchCompletions(prompt, OPENAI_API_KEY, selectedModel);
+    
+    // Remove the custom cursor class from the body
+    document.body.classList.remove('custom-cursor');
+    
     handleResponse(response, textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
   }
 });
