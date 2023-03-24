@@ -1,5 +1,7 @@
 import './index.css'
 
+console.log('popup.js ')
+
 const crx = 'textcompletion'
 
 const apiKeyInput = document.getElementById('apiKeyInput')
@@ -24,7 +26,7 @@ function getApiKey() {
   })
 }
 
-;(async function () {
+(async function () {
   // Set the initial value of the input field to the current API key
   const currentApiKey = await getApiKey()
   apiKeyInput.value = currentApiKey
@@ -107,6 +109,7 @@ function loadApiKey() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("dom loaded")
   const apiKeyInput = document.getElementById('apiKeyInput')
   const updateApiKeyButton = document.getElementById('updateApiKeyButton')
   const checkBalanceButton = document.getElementById('checkBalanceButton')
@@ -120,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Listen for button clicks
   if (updateApiKeyButton) {
+    console.log("yes update button")
     updateApiKeyButton.addEventListener('click', async () => {
       console.log('click')
       const newApiKey = apiKeyInput.value

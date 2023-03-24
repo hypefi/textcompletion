@@ -16,21 +16,22 @@ style.textContent = `
 document.head.appendChild(style);
 
 
-function getModel() {
+
+async function getModel() {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("selectedModel", function (data) {
-      console.log("Model retrieved: ", data.selectedModel);
+    chrome.runtime.sendMessage({ action: "getStorageData", key: "selectedModel" }, function (response) {
+      console.log("Model retrieved: ", response.data);
 
       const modelMap = {
         chatweb: "text-davinci-002-render-sha",
         chat3: "text-davinci-003",
-        chat35: "gpt-3.5-turbo", 
-        chatgptplus4 : "gpt-4",
+        chat35: "gpt-3.5-turbo",
+        chatgptplus4: "gpt-4",
         chatgptapi4_8k: "gpt-4",
         chatgptapi4_32k: "gpt-4-32k",
       };
 
-      const selectedModel = data.selectedModel;
+      const selectedModel = response.data;
       const modelName = modelMap[selectedModel];
 
       resolve(modelName);
@@ -79,18 +80,19 @@ function fetchCompletions(prompt, apiKey, model) {
 
 
 
-function getApiKey() {
+
+async function getApiKey() {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("apiKey", function (data) {
-      console.log("API key retrieved: ", data.apiKey);
-      resolve(data.apiKey);
+    chrome.runtime.sendMessage({ action: "getStorageData", key: "apiKey" }, function (response) {
+      console.log("API key retrieved: ", response.data);
+      resolve(response.data);
     });
   });
 }
 
-function updateApiKey(newApiKey) {
+async function updateApiKey(newApiKey) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.set({ apiKey: newApiKey }, () => {
+    chrome.runtime.sendMessage({ action: "setStorageData", key: "apiKey", value: newApiKey }, function (response) {
       console.log("API key updated: ", newApiKey);
       resolve();
     });
