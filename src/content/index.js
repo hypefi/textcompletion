@@ -41,20 +41,42 @@ async function getModel() {
 
 
 
-async function handleResponse(response, textAfterCursor, textToComplete, textBeforeCursor, slstart) {
+async function handleResponse(response, model, textAfterCursor, textToComplete, textBeforeCursor, slstart) {
   try {
-    const data = await response.json();
+    // const data = await response.json();
+    const data = await response;
     console.log(data);
-    const recommendedText = data.choices[0].text.trim();
-    const textAfterRecommendation = textAfterCursor.trimLeft();
-    let completedText = recommendedText.slice(textToComplete.length);
-    let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
-    console.log({ recommendedText });
-    console.log({ newText });
+    console.log(data.json());
+    let data_ = data.json();
+    
+    if(model){
+        
+      const recommendedText = data_.choices[0].message.content.trim();
+      const textAfterRecommendation = textAfterCursor.trimLeft();
+      let completedText = recommendedText.slice(textToComplete.length);
+      let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
+      console.log({ recommendedText });
+      console.log({ newText });
 
-    document.activeElement.value = textBeforeCursor + newText;
-    slstart = slstart + completedText.length;
-    let slend = slstart;
+      document.activeElement.value = textBeforeCursor + newText;
+      slstart = slstart + completedText.length;
+      let slend = slstart;
+
+    }else{
+
+      const recommendedText = data_.choices[0].text.trim();
+      const textAfterRecommendation = textAfterCursor.trimLeft();
+      let completedText = recommendedText.slice(textToComplete.length);
+      let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
+      console.log({ recommendedText });
+      console.log({ newText });
+
+      document.activeElement.value = textBeforeCursor + newText;
+      slstart = slstart + completedText.length;
+      let slend = slstart;
+
+
+    }
   } catch (error) {
     console.error(error);
   }
@@ -62,20 +84,51 @@ async function handleResponse(response, textAfterCursor, textToComplete, textBef
 
 
 function fetchCompletions(prompt, apiKey, model) {
-  console.log(model, " apikey ", apiKey)
-  return fetch("https://api.openai.com/v1/completions", {
+  console.log(model, " apikey ", apiKey);
+  let mod;
+
+  const chatModels = ["gpt-4", "gpt-4-0314", "gpt-4-32k", "gpt-4-32k-0314", "gpt-3.5-turbo", "gpt-3.5-turbo-0301"];
+  const completionModels = ["text-davinci-003", "text-davinci-002", "text-curie-001", "text-babbage-001", "text-ada-001", "davinci", "curie", "babbage", "ada"];
+  
+  let endpoint, payload;
+  
+  if (chatModels.includes(model)) {
+    mod = true
+    endpoint = "https://api.openai.com/v1/chat/completions";
+    payload = "messages"
+    prompt = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "finish this sentence : " + prompt},
+    ];
+  } else if (completionModels.includes(model)) {
+    mod = false
+    endpoint = "https://api.openai.com/v1/completions";
+    payload = "prompt";
+  } else {
+    throw new Error("Invalid model specified.");
+  }
+
+  // let PL = {
+  //     payload: prompt,
+  //     max_tokens: 500,
+  //     model: model,
+  //     temperature: 0.7,
+  //   };
+  // console.log(PL);
+
+  return [fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      prompt: prompt,
+      [payload]: prompt,
       max_tokens: 500,
       model: model,
       temperature: 0.7,
     }),
-  });
+  }), mod];
 }
 
 
@@ -126,7 +179,8 @@ document.addEventListener("keydown", async function(event) {
     // Remove the custom cursor class from the body
     document.body.classList.remove('custom-cursor');
     
-    handleResponse(response, textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
+    console.log(response[0])
+    handleResponse(response[0], response[1], textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
   }
 });
 
