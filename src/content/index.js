@@ -43,14 +43,13 @@ async function getModel() {
 
 async function handleResponse(response, model, textAfterCursor, textToComplete, textBeforeCursor, slstart) {
   try {
-    // const data = await response.json();
-    const data = await response;
-    console.log(data);
-    console.log(data.json());
-    let data_ = data.json();
     
     if(model){
-        
+      let data = await response.then(res => fetchAndRead(res));
+      console.log(data)
+      // console.log(data.choices)
+      let data_ = JSON.parse(data);
+      console.log(data_.choices)
       const recommendedText = data_.choices[0].message.content.trim();
       const textAfterRecommendation = textAfterCursor.trimLeft();
       let completedText = recommendedText.slice(textToComplete.length);
@@ -63,8 +62,10 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
       let slend = slstart;
 
     }else{
-
-      const recommendedText = data_.choices[0].text.trim();
+    const data = await response;
+    console.log(data);
+// .json();
+      const recommendedText = data.choices[0].text.trim();
       const textAfterRecommendation = textAfterCursor.trimLeft();
       let completedText = recommendedText.slice(textToComplete.length);
       let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
@@ -129,6 +130,47 @@ function fetchCompletions(prompt, apiKey, model) {
       temperature: 0.7,
     }),
   }), mod];
+}
+
+
+async function fetchAndRead(response) {
+  try {
+    // Check if the fetch was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Get the ReadableStream from the response
+    const readableStream = response.body;
+
+    // Create a new reader for the stream
+    const reader = readableStream.getReader();
+
+    // Define a text decoder to decode the stream
+    const decoder = new TextDecoder('utf-8');
+    let result = '';
+
+    // Read the stream and process the data
+    while (true) {
+      // Read a chunk from the stream
+      const { value, done } = await reader.read();
+
+      // If the stream is done, break the loop
+      if (done) {
+        break;
+      }
+
+      // Decode the chunk and append it to the result
+      result += decoder.decode(value);
+    }
+
+    // Log the result to the console
+    console.log(result);
+    return result;
+
+  } catch (error) {
+    console.error('Fetch and read failed: ', error);
+  }
 }
 
 
