@@ -62,10 +62,12 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
       let slend = slstart;
 
     }else{
-    const data = await response;
-    console.log(data);
+    // const data = await response;
+      let data = await response.then(res => fetchAndRead(res));
+      console.log(data);
 // .json();
-      const recommendedText = data.choices[0].text.trim();
+      let data_ = JSON.parse(data);
+      const recommendedText = data_.choices[0].text.trim();
       const textAfterRecommendation = textAfterCursor.trimLeft();
       let completedText = recommendedText.slice(textToComplete.length);
       let newText = textBeforeCursor.slice(0, -textToComplete.length) + completedText + textAfterRecommendation;
@@ -89,7 +91,7 @@ function fetchCompletions(prompt, apiKey, model) {
   let mod;
 
   const chatModels = ["gpt-4", "gpt-4-0314", "gpt-4-32k", "gpt-4-32k-0314", "gpt-3.5-turbo", "gpt-3.5-turbo-0301"];
-  const completionModels = ["text-davinci-003", "text-davinci-002", "text-curie-001", "text-babbage-001", "text-ada-001", "davinci", "curie", "babbage", "ada"];
+  const completionModels = ["text-davinci-003", "text-davinci-002-render-sha", "text-davinci-002", "text-curie-001", "text-babbage-001", "text-ada-001", "davinci", "curie", "babbage", "ada"];
   
   let endpoint, payload;
   
