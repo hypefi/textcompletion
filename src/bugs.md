@@ -1,0 +1,2 @@
+- the generated text should stay even if you click outside the input box after generation 
+-

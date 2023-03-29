@@ -6,3 +6,4 @@
  - Maybe add the feature of accepting or rejecting the completion
 > - start/stop extension button 
 
+- add a rewrite feature ==> rewrite the selected text, you need to be able to undo with shortcut

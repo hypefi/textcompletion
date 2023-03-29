@@ -6,14 +6,6 @@ let selectedModel;
 
 
 
-//custom cursor when fetching 
-const style = document.createElement('style');
-style.textContent = `
-  .custom-cursor {
-  cursor: url('/Users/admin/Downloads/output-onlinegiftools.gif'), auto;
-  }
-`;
-document.head.appendChild(style);
 
 
 
@@ -112,13 +104,6 @@ function fetchCompletions(prompt, apiKey, model) {
     throw new Error("Invalid model specified.");
   }
 
-  // let PL = {
-  //     payload: prompt,
-  //     max_tokens: 500,
-  //     model: model,
-  //     temperature: 0.7,
-  //   };
-  // console.log(PL);
 
   return [fetch(endpoint, {
     method: "POST",
@@ -241,6 +226,33 @@ document.addEventListener("focusout", function(event) {
     textInputField = null;
   }
 });
+
+// document.addEventListener('DOMContentLoaded', () => {
+
+
+function init() {
+
+console.log("dom loaded");
+const style = document.createElement('style');
+style.textContent = `
+  .custom-cursor {
+    cursor: url('https://s2.svgbox.net/loaders.svg?ic=grid'), auto;
+    height: 30px;
+    width: 30px;
+  }
+`;
+document.head.appendChild(style);
+console.log("Style element added to the head:", style);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+//custom cursor when fetching 
+// })
+
 
 
 export {}
