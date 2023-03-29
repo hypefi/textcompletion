@@ -63,6 +63,7 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
 
     }else{
     // const data = await response;
+      console.log(response);
       let data = await response.then(res => fetchAndRead(res));
       console.log(data);
 // .json();
