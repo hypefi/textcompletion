@@ -7,8 +7,6 @@ let selectedModel;
 
 
 
-
-
 async function getModel() {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage({ action: "getStorageData", key: "selectedModel" }, function (response) {
@@ -53,6 +51,9 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
       slstart = slstart + completedText.length;
       let slend = slstart;
 
+      document.body.classList.remove('custom-cursor');
+      console.log("remove custom cursor")
+
     }else{
     // const data = await response;
       console.log(response);
@@ -72,9 +73,15 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
       let slend = slstart;
 
 
+      document.body.classList.remove('custom-cursor');
+      console.log("remove custom cursor")
+
     }
   } catch (error) {
     console.error(error);
+    // give user the there was an error in a popup 
+    document.body.classList.remove('custom-cursor');
+    console.log("remove custom cursor")
   }
 }
 
@@ -203,11 +210,11 @@ document.addEventListener("keydown", async function(event) {
     
     // Add the custom cursor class to the body
     document.body.classList.add('custom-cursor');
+    console.log("add custom cursor")
     
     const response = await fetchCompletions(prompt, OPENAI_API_KEY, selectedModel);
     
     // Remove the custom cursor class from the body
-    document.body.classList.remove('custom-cursor');
     
     console.log(response[0])
     handleResponse(response[0], response[1], textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
@@ -234,14 +241,19 @@ function init() {
 
 console.log("dom loaded");
 const style = document.createElement('style');
+// style.textContent = `
+//   .custom-cursor {
+//     cursor: url('https://s2.svgbox.net/loaders.svg?ic=grid'), auto;
+//     height: 30px;
+//     width: 30px;
+//   }
+// `;
 style.textContent = `
   .custom-cursor {
-    cursor: url('https://s2.svgbox.net/loaders.svg?ic=grid'), auto;
-    height: 30px;
-    width: 30px;
+    cursor: url('${chrome.runtime.getURL("assets/loaders.svg")}'), auto;
   }
 `;
-document.head.appendChild(style);
+document.body.appendChild(style);
 console.log("Style element added to the head:", style);
 }
 
