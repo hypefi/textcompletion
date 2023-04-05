@@ -31,7 +31,7 @@ async function getModel() {
 
 
 
-async function handleResponse(response, model, textAfterCursor, textToComplete, textBeforeCursor, slstart) {
+async function handleResponse(response, model, textAfterCursor, textToComplete, textBeforeCursor, slstart, input_) {
   try {
     
     if(model){
@@ -47,7 +47,11 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
       console.log({ recommendedText });
       console.log({ newText });
 
-      document.activeElement.value = textBeforeCursor + newText;
+      if(input_){
+            document.activeElement.value = textBeforeCursor + newText;
+      }else{
+            document.getSelection().baseNode.textContent = textBeforeCursor + newText;
+      }
       slstart = slstart + completedText.length;
       let slend = slstart;
 
@@ -68,7 +72,11 @@ async function handleResponse(response, model, textAfterCursor, textToComplete, 
       console.log({ recommendedText });
       console.log({ newText });
 
-      document.activeElement.value = textBeforeCursor + newText;
+      if(input_){
+            document.activeElement.value = textBeforeCursor + newText;
+      }else{
+   document.getSelection().baseNode.textContent = textBeforeCursor + newText;
+      }
       slstart = slstart + completedText.length;
       let slend = slstart;
 
@@ -193,17 +201,47 @@ async function updateApiKey(newApiKey) {
 document.addEventListener("keydown", async function(event) {
   console.log("keydown");
   let noden =  document.activeElement.nodeName;
-  if (event.metaKey && event.code === "KeyK" && ("TEXTAREA" === noden || "INPUT" === noden)) {
-    event.preventDefault();
-    textInputField = document.activeElement.innerHTML
-    let selectionStart = document.activeElement.selectionStart;
-    const textBeforeCursor = textInputField.slice(0, selectionStart);
-    const textAfterCursor = textInputField.slice(selectionStart);
-    const textToComplete = textBeforeCursor.split(" ").pop();
-    console.log({textBeforeCursor})
+  if (event.metaKey && event.code === "KeyK" ) {
+    if( "TEXTAREA" === noden || "INPUT" === noden  ){
 
+        event.preventDefault();
+        textInputField = document.activeElement.innerHTML
+        let selectionStart = document.activeElement.selectionStart;
+        const textBeforeCursor = textInputField.slice(0, selectionStart);
+        const textAfterCursor = textInputField.slice(selectionStart);
+        const textToComplete = textBeforeCursor.split(" ").pop();
+        console.log({textBeforeCursor})
+
+        OPENAI_API_KEY = await getApiKey();
+        selectedModel = await getModel();
+
+        console.log(OPENAI_API_KEY);
+        const prompt = textBeforeCursor + "\n";
+        
+        // Add the custom cursor class to the body
+        document.body.classList.add('custom-cursor');
+        console.log("add custom cursor")
+        
+        const response = await fetchCompletions(prompt, OPENAI_API_KEY, selectedModel);
+        
+        // Remove the custom cursor class from the body
+        
+        console.log(response[0])
+        handleResponse(response[0], response[1], textAfterCursor, textToComplete, textBeforeCursor, selectionStart, true);
+
+
+  }else{
+    textInputField = document.getSelection().baseNode.textContent;
+    console.log({textInputField});
+    console.log(OPENAI_API_KEY);
     OPENAI_API_KEY = await getApiKey();
     selectedModel = await getModel();
+
+
+    const textBeforeCursor = textInputField;
+    const textAfterCursor = "";
+    const textToComplete = textBeforeCursor.split(" ").pop();
+
 
     console.log(OPENAI_API_KEY);
     const prompt = textBeforeCursor + "\n";
@@ -217,7 +255,11 @@ document.addEventListener("keydown", async function(event) {
     // Remove the custom cursor class from the body
     
     console.log(response[0])
-    handleResponse(response[0], response[1], textAfterCursor, textToComplete, textBeforeCursor, selectionStart);
+    handleResponse(response[0], response[1], textAfterCursor, textToComplete, textBeforeCursor, 0, false);
+
+
+
+  }
   }
 });
 
