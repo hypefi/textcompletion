@@ -1,6 +1,6 @@
 # textcompletion
 
-A minimalist chrome extension that completes your text when you press ALT+K shortcut with OPENAI completions or chatGPT models 
+A minimalist chrome extension that completes your text when you press ALT+K shortcut, in any input field or textarea, with OPENAI completions or chatGPT models 
 
 ## Installing
 
